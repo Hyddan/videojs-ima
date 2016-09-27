@@ -152,7 +152,7 @@
       this.controlsDiv.style.width = '100%';
       this.countdownDiv = document.createElement('div');
       assignControlAttributes_(this.countdownDiv, 'ima-countdown-div');
-      this.countdownDiv.innerHTML = this.settings.adLabel;
+      this.countdownDiv.innerHTML = ("function" === typeof this.settings.adLabel) ? this.settings.adLabel({}) : this.settings.adLabel;
       this.countdownDiv.style.display = this.showCountdown ? 'block' : 'none';
       this.seekBarDiv = document.createElement('div');
       assignControlAttributes_(this.seekBarDiv, 'ima-seek-bar-div');
@@ -513,7 +513,7 @@
         totalAds = this.currentAd.getAdPodInfo().getTotalAds();
       }
 
-      // Update countdown timer data
+      // Prepare countdown timer data
       var remainingMinutes = Math.floor(remainingTime / 60);
       var remainingSeconds = Math.floor(remainingTime % 60);
       if (remainingSeconds.toString().length < 2) {
@@ -523,14 +523,29 @@
       if (isPod && (totalAds > 1)) {
         podCount = ' (' + adPosition + ' of ' + totalAds + '): ';
       }
-      this.countdownDiv.innerHTML =
-          this.settings.adLabel + podCount +
-          remainingMinutes + ':' + remainingSeconds;
 
       // Update UI
       var playProgressRatio = currentTime / duration;
       var playProgressPercent = playProgressRatio * 100;
       this.progressDiv.style.width = playProgressPercent + '%';
+
+      // Update countdown timer data
+      if ("function" === typeof this.settings.adLabel) {
+        this.countdownDiv.innerHTML = this.settings.adLabel({
+          playProgressRatio: playProgressRatio,
+          playProgressPercent: playProgressPercent,
+          remainingMinutes: remainingMinutes,
+          remainingSeconds: remainingSeconds,
+          remainingTime: remainingTime,
+          podCount: podCount,
+          adPosition: adPosition,
+          totalAds: totalAds
+        });
+      } else {
+        this.countdownDiv.innerHTML =
+          this.settings.adLabel + podCount +
+          remainingMinutes + ':' + remainingSeconds;
+      }
     }.bind(this);
 
     this.getPlayerWidth = function() {
