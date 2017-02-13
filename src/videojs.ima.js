@@ -450,6 +450,8 @@
         for (var index in this.contentAndAdsEndedListeners) {
           this.contentAndAdsEndedListeners[index]();
         }
+
+        reset_();
       }
     }.bind(this);
 
@@ -777,6 +779,19 @@
       this.player.off('loadedmetadata', playContentFromZero_);
       this.player.currentTime(0);
       this.player.play();
+    }.bind(this);
+
+    /**
+     * Resets the plugin.
+     * @private
+     */
+    var reset_ = function () {
+      clearInterval(this.updateTimeIntervalHandle);
+      clearInterval(this.seekCheckIntervalHandle);
+      clearInterval(this.resizeCheckIntervalHandle);
+      if(this.player.el()) {
+        this.player.one('play', setUpPlayerIntervals_);
+      }
     }.bind(this);
 
     /**
@@ -1300,12 +1315,8 @@
         for (var index in this.contentAndAdsEndedListeners) {
           this.contentAndAdsEndedListeners[index]();
         }
-      }
-      clearInterval(this.updateTimeIntervalHandle);
-      clearInterval(this.seekCheckIntervalHandle);
-      clearInterval(this.resizeCheckIntervalHandle);
-      if(this.player.el()) {
-        this.player.one('play', setUpPlayerIntervals_);
+
+        reset_();
       }
     }.bind(this);
 
